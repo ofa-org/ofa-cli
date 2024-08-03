@@ -3,47 +3,34 @@
 import figlet from 'figlet'
 import chalk from 'chalk'
 import { Command } from 'commander'
-import create from '../lib/create.js'
-import { readPackageSync } from 'read-pkg'
-import path from 'path'
-import { dirname, join } from 'path'
-import { fileURLToPath } from 'url'
+import create from '../lib/create/index.js'
+import generator from '../lib/generator/index.js'
+import { getPkg } from '../lib/utils/index.js'
 
 exec()
 function exec() {
-  const __filename = fileURLToPath(import.meta.url)
-  const __dirname = join(dirname(__filename), '..')
-  const pkg = readPackageSync({ cwd: __dirname })
+  const pkg = getPkg()
   // 当前命令行选择的目录
   const program = new Command()
   program
     // 定义命令和参数
     .command('create <app-name>')
-    .description('create a new project')
-    // -f or --force 为强制创建，如果创建的目录存在则直接覆盖
-    .option('-f, --force', 'overwrite target directory if it exist')
+    .alias('c')
+    .description('新建项目')
+    .option('-f, --force', '如果目录存在则直接覆盖')
     .action((name, options) => {
       create(name, options)
     })
 
-  // 配置 config 命令
+  // 生成组件模板/页面模板
   program
-    .command('config [value]')
-    .description('inspect and modify the config')
-    .option('-g, --get <path>', 'get value from option')
-    .option('-s, --set <path> <value>')
-    .option('-d, --delete <path>', 'delete option from config')
-    .action((value, options) => {
-      console.log('config', value, options)
-    })
-
-  // 配置 ui 命令
-  program
-    .command('ui')
-    .description('start add open roc-cli ui')
-    .option('-p, --port <port>', 'Port used for the UI Server')
+    .command('gen')
+    .alias('g')
+    .description(' 生成组件模板/页面模板')
+    .option('-c, --component <name>', 'component')
+    .option('-p, --page <name>', 'component')
     .action((option) => {
-      console.log('ui', option)
+      generator(option)
     })
 
   program
@@ -64,9 +51,9 @@ function exec() {
 
       // 新增说明信息
       console.log(
-        `\r\nRun ${chalk.cyan(
-          `zr <command> --help`
-        )} for detailed usage of given command\r\n`
+        `\r\n执行 ${chalk.cyan(
+          `ofa-cli <command> --help`
+        )} 查看相关命令的详细用法\r\n`
       )
     })
 
